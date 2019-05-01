@@ -47,23 +47,19 @@ void ThingSpeakPortalClient:: begin( unsigned long baud_rate ) {
   } 
 }
 
-void ThingSpeakPortalClient:: send( String status = "", ... ) {
-  va_list arguments;
-  va_start( arguments, _fieldCount );  
+void ThingSpeakPortalClient:: send( String status, float args[] ) {
 
-  String json = "\"destination\": \"thingspeak\", \"api_key\": \"" + _apiKey + ", \"channel\": " + _channel + ", \"status\": " + status + ", \"fields\": [";
+  String json = "{\"destination\": \"thingspeak\", \"api_key\": \"" + _apiKey + "\", \"channel\": " + _channel + ", \"status\": \"" + status + "\", \"fields\": [";
   bool first = true;
   for( int a = 0; a < _fieldCount; a++ ) {
-    float arg = va_arg( arguments, float); 
-    json += String(first ? "" : ", ") + String(arg);
+    json += String(first ? "" : ", ") + String(args[a]);
     first = false;
   }
-  va_end( arguments );
-
   json += "]}";
+  
   if( _hwSerial != NULL ) { 
-    _hwSerial->print(json);
+    _hwSerial->println(json);
   } else if( _swSerial != NULL ) { 
-    _swSerial->print(json);
+    _swSerial->println(json);
   } 
 }

@@ -103,7 +103,7 @@ class ThingSpeakPortalClient {
      * expects the list of variables to be the same number as specified in fieldCount in the
      * constructor.
      */
-    void send( String status = "", ... );
+    void send( String status, float args[] );
 
   private: 
     HardwareSerial* _hwSerial = NULL;
