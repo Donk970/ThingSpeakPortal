@@ -1,6 +1,22 @@
+/*
+ * This should be flashed to an ESP8266-01 which is connected to another 
+ * client device through a serial port.  We expect to see data on the 
+ * serial port in the form of a JSON string. 
+ * 
+ * example:  {"destination": "thingspeak", "api_key": "YOURAPIKEYHERE", "channel": xyz, "fields": [nn.nn, mm.mm, oo.oo, ...]}
+ * 
+ * To make this easier use the ThingSpeakPortalClient
+ */
 
+
+
+/*
+ * If the client is able to send data over hardware serial this should be 0.
+ * If the client needs to use SoftwareSerial set this to 1
+ */
 #define _USING_SOFT_SERIAL_ 0
-
+#define HARDWARE_SERIAL_BAUD_RATE 115200
+#define SOFTWARE_SERIAL_BAUD_RATE 38400
 
 
 #include "ThingSpeak.h"
@@ -19,9 +35,9 @@ bool sendThingSpeakData( String json );
 void setup() {
   //On Arduino or Genuino 101 the current maximum RX speed is 57600 bps
   #if _USING_SOFT_SERIAL_ 
-    Serial.begin(38400);  // Initialize serial
+    Serial.begin(SOFTWARE_SERIAL_BAUD_RATE);  // Initialize serial
   #else 
-    Serial.begin(115200);  // Initialize serial
+    Serial.begin(HARDWARE_SERIAL_BAUD_RATE);  // Initialize serial
   #endif
 
   WiFi.mode(WIFI_STA); 
@@ -94,18 +110,12 @@ bool sendThingSpeakData( String json ) {
     } 
   }
 
-//  Serial.print("api_key: "); Serial.println(api_key);
-//  Serial.print("channel: "); Serial.println(channel);
-//  Serial.print("fields: [ ");
-
   unsigned int index = 1;
   for( auto field : fields ) {
     float fieldValue = field.as<float>();
- //   Serial.print(fieldValue); Serial.print(", ");
     ThingSpeak.setField(index, fieldValue);
     index += 1;
   }
-//  Serial.println("]");
 
   if( root.containsKey(k_status_key) ) {
     const char *status = root[k_status_key].as<const char*>();
